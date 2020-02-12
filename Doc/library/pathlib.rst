@@ -1006,7 +1006,10 @@ call fails (for example because the path doesn't exist).
       >>> p = Path('docs/../setup.py')
       >>> p.resolve()
       PosixPath('/home/antoine/pathlib/setup.py')
-
+   
+   In addition, case is normalized and any mapped network share's ``drive`` is
+   replaced with its UNC path.
+   
    If the path doesn't exist and *strict* is ``True``, :exc:`FileNotFoundError`
    is raised.  If *strict* is ``False``, the path is resolved as far as possible
    and any remainder is appended without checking whether it exists.  If an
