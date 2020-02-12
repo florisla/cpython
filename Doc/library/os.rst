@@ -1728,6 +1728,8 @@ features:
 .. function:: getcwd()
 
    Return a string representing the current working directory.
+   
+   Function :func:`os.chdir` allows to change the current working directory.
 
 
 .. function:: getcwdb()
