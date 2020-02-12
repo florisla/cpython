@@ -668,8 +668,8 @@ call fails (for example because the path doesn't exist).
 
 .. classmethod:: Path.cwd()
 
-   Return a new path object representing the current directory (as returned
-   by :func:`os.getcwd`)::
+   Return a new path object representing the current working directory (as
+   returned by :func:`os.getcwd`)::
 
       >>> Path.cwd()
       PosixPath('/home/antoine/pathlib')
