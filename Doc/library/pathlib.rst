@@ -1152,44 +1152,62 @@ Absolute paths
 A path is considered *absolute* (:func:`PurePath.is_absolute`) if it has
 a *root*.
 
-But there are *multiple* details which may change when transforming
-a path into its full, canonical variant.
+The recommended way to ensure a path is absolute is to call
+:meth:`Path.resolve`.
 
-- Add ``root`` (local or global) if it's not already present.  
-- Add ``drive`` letter or name if the Path flavour allows it and it's not
-  already present.    
+This will ensure the following details of the path are changed:
+
+- Add a ``root`` (local or global) if it's not already present.  
 - Replace releative parts ("``..``") with absolute ones.
-- Replace symbolic links or junctions with their destination.
-- Change case to the canonical case on case-insensitive but case-preserving
-  file systems.
-- Replace ``drive`` with the UNC share name if the drive is a Windows mapped
-  network share ("``X:``" becomes "``\\filehost\folder``")
+- Replace symbolic links with their destination.
+- Change case to the canonical case on case-insensitive file systems
+  which do preserve case.
 
-The function :meth:`Path.resolve` applies all of the above
-transformations.
-
-If the path is not yet absolute, it adds ``root``, ``drive`` and the base
-folder path of the current working directory as retrieved by
+If the path is not yet absolute, :meth:`Path.resolve` adds the ``root``
+and the base folder path of the current working directory as retrieved by
 :func:`Path.cwd`.
 
 In contrast, :func:`os.path.abspath` also uses the current working directory
-but it does *not* follow symbolic links, never modifies case, and does not
-replace network share ``drive`` with the UNC path.
+but it does *not* follow symbolic links and never modifies case.
 
-It also behaves non-*strict*: :func:`os.path.abspath` never raises
+:func:`os.path.abspath` always behaves non-*strict*: it never raises
 :exc:`FileNotFoundError` -- no matter which Python version is used.
 
-If you desire even less side effects and only want to ensure the path
-has a ``root``, then simply prepend it with the current working
-directory::
+If you only want to ensure a path has a ``root``, then simply prepend it
+with the current working directory::
 
    >>> Path.cwd() / '../file.txt'
    PosixPath('/home/anne/../file.txt')
 
-This technique preserves the path if it was already absolute:
+This technique correctly preserves the path if it was already absolute:
 
    >>> Path.cwd() / "/absolute/path"
    PosixPath('/absolute/path')
+
+
+
+Windows considerations
+^^^^^^^^^^^^^^^^^^^^^^
+On Windows, a path's *root* is relative to the *drive*; a path needs to have
+both a root and a drive to be absolute.  :meth:`PurePath.is_absolute` checks
+for both while :func:`os.path.isabs` only checks *root*.
+:meth:`Path.resolve` correctly adds root and drive if they'r not present.
+
+While :func:`os.path.abspath` preserves case, it will change the drive
+letter from lower to upper case if the path lacks a root:
+``os.path.abspath('d:spam')`` returns ``D:\\spam``.
+
+Another difference is the handling of UNC shares mapped as a drive. 
+:meth:`Path.resolve` replaces ``drive`` with the UNC share name (e.g. 
+"``X:``" becomes "``\\filehost\folder``") while :func:`os.path.abspath` 
+disregards UNC shares.
+
+*Substitute drives* are also be replaced by :meth:`Path.resolve`, for example
+when using ``C:\data`` as drive ``X:``, "``X:\file.txt``" resolves to
+"``C:\data\file.txt``".
+
+Also be aware that Windows junctions resolve differently from Unix symbolic
+links when followed by relative parts.
 
 
 Correspondence to tools in the :mod:`os` module
