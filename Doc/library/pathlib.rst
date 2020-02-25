@@ -460,6 +460,9 @@ Pure paths provide the following methods and properties:
       False
       >>> PureWindowsPath('//some/share').is_absolute()
       True
+    
+   See the section :ref:`absolute paths <absolute-paths>` for how to ensure
+   a path is absolute.
 
 
 .. method:: PurePath.is_relative_to(*other)
