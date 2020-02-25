@@ -1136,6 +1136,55 @@ call fails (for example because the path doesn't exist).
    have the same meaning as in :func:`open`.
 
    .. versionadded:: 3.5
+   
+   
+.. _absolute-paths:
+
+Absolute paths
+--------------
+
+A path is considered *absolute* (:func:`PurePath.is_absolute`) if it has
+a *root*.
+
+But there are *multiple* details which may change when transforming
+a path into its full, canonical variant.
+
+- Add ``root`` (local or global) if it's not already present.  
+- Add ``drive`` letter or name if the Path flavour allows it and it's not
+  already present.    
+- Replace releative parts ("``..``") with absolute ones.
+- Replace symbolic links or junctions with their destination.
+- Change case to the canonical case on case-insensitive but case-preserving
+  file systems.
+- Replace ``drive`` with the UNC share name if the drive is a Windows mapped
+  network share ("``X:``" becomes "``\\filehost\folder``")
+
+The function :meth:`Path.resolve` applies all of the above
+transformations.
+
+If the path is not yet absolute, it adds ``root``, ``drive`` and the base
+folder path of the current working directory as retrieved by
+:func:`Path.cwd`.
+
+In contrast, :func:`os.path.abspath` also uses the current working directory
+but it does *not* follow symbolic links, never modifies case, and does not
+replace network share ``drive`` with the UNC path.
+
+It also behaves non-*strict*: :func:`os.path.abspath` never raises
+:exc:`FileNotFoundError` -- no matter which Python version is used.
+
+If you desire even less side effects and only want to ensure the path
+has a ``root``, then simply prepend it with the current working
+directory::
+
+   >>> Path.cwd() / '../file.txt'
+   PosixPath('/home/anne/../file.txt')
+
+This technique preserves the path if it was already absolute:
+
+   >>> Path.cwd() / "/absolute/path"
+   PosixPath('/absolute/path')
+
 
 Correspondence to tools in the :mod:`os` module
 -----------------------------------------------
