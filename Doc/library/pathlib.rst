@@ -1013,6 +1013,9 @@ call fails (for example because the path doesn't exist).
    infinite loop is encountered along the resolution path, :exc:`RuntimeError`
    is raised.
 
+   Section :ref:`absolute paths <absolute-paths>` discusses other techniques
+   to make a path absolute.
+
    .. versionadded:: 3.6
       The *strict* argument (pre-3.6 behavior is strict).
 
